@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康趋势预测与预警系统 - 温麟湘</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .content {
+            padding: 30px;
+        }
+        .risk-alert-section {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #e17055;
+        }
+        .risk-alert-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d63031;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .risk-alert-title::before {
+            content: '⚠️';
+            font-size: 24px;
+        }
+        .risk-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .risk-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .risk-item-high {
+            border-left: 4px solid #e74c3c;
+        }
+        .risk-item-medium {
+            border-left: 4px solid #f39c12;
+        }
+        .risk-item-low {
+            border-left: 4px solid #3498db;
+        }
+        .risk-name {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .risk-desc {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+        }
+        .risk-trend {
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .trend-up {
+            color: #e74c3c;
+        }
+        .trend-down {
+            color: #27ae60;
+        }
+        .trend-stable {
+            color: #3498db;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .chart-container.full-width {
+            grid-column: 1 / -1;
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .chart {
+            width: 100%;
+            height: 400px;
+        }
+        .prediction-section {
+            background: linear-gradient(135deg, #a8e6cf 0%, #88d8b0 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .prediction-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .prediction-title::before {
+            content: '📈';
+            font-size: 24px;
+        }
+        .prediction-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+        .prediction-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .prediction-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .prediction-metric {
+            font-size: 24px;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 5px;
+        }
+        .prediction-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .prediction-timeframe {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+        .reminder-section {
+            background: linear-gradient(135deg, #81ecec 0%, #74b9ff 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .reminder-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0984e3;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .reminder-title::before {
+            content: '🔔';
+            font-size: 24px;
+        }
+        .reminder-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .reminder-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .reminder-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .reminder-content h4 {
+            font-size: 14px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .reminder-content p {
+            font-size: 12px;
+            color: #7f8c8d;
+            line-height: 1.5;
+        }
+        .summary-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+        }
+        .summary-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+        .summary-item {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .summary-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .summary-value.green {
+            color: #27ae60;
+        }
+        .summary-value.red {
+            color: #e74c3c;
+        }
+        .summary-value.blue {
+            color: #3498db;
+        }
+        .summary-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>健康趋势预测与预警系统</h1>
+            <p>客户：温麟湘 | 评估周期：2025-12-13 → 2026-01-13 | 预测周期：未来6个月</p>
+        </div>
+        
+        <div class="content">
+            <!-- 风险预警区 -->
+            <div class="risk-alert-section">
+                <div class="risk-alert-title">健康风险预警</div>
+                <div class="risk-items">
+                    <div class="risk-item risk-item-high">
+                        <div class="risk-name">青光眼风险 - 高危</div>
+                        <div class="risk-desc">眼胀、眼痛、视力模糊持续存在，需定期眼科检查</div>
+                        <div class="risk-trend trend-down">⬇ 症状改善26%，但风险仍高</div>
+                    </div>
+                    <div class="risk-item risk-item-medium">
+                        <div class="risk-name">高血压风险 - 中等</div>
+                        <div class="risk-desc">头疼、偏头痛与肝阳上亢相关，需监测血压</div>
+                        <div class="risk-trend trend-down">⬇ 症状强度降低4-6分</div>
+                    </div>
+                    <div class="risk-item risk-item-medium">
+                        <div class="risk-name">糖尿病风险 - 中等</div>
+                        <div class="risk-desc">体质偏寒凉、气虚，需注意血糖监测</div>
+                        <div class="risk-trend trend-stable">➡ 趋势稳定，持续关注</div>
+                    </div>
+                    <div class="risk-item risk-item-low">
+                        <div class="risk-name">失眠风险 - 低</div>
+                        <div class="risk-desc">情绪状态改善，睡眠质量提升</div>
+                        <div class="risk-trend trend-down">⬇ 情绪指标改善明显</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 趋势预测区 -->
+            <div class="prediction-section">
+                <div class="prediction-title">健康改善趋势预测</div>
+                <div class="prediction-cards">
+                    <div class="prediction-card">
+                        <div class="prediction-icon">💪</div>
+                        <div class="prediction-metric">+35%</div>
+                        <div class="prediction-label">预计3个月综合改善度</div>
+                        <div class="prediction-timeframe">基于当前调理效果推算</div>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-icon">👁️</div>
+                        <div class="prediction-metric">-40%</div>
+                        <div class="prediction-label">预计眼部症状缓解率</div>
+                        <div class="prediction-timeframe">青光眼风险逐步降低</div>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-icon">🧠</div>
+                        <div class="prediction-metric">+25%</div>
+                        <div class="prediction-label">预计免疫力提升幅度</div>
+                        <div class="prediction-timeframe">持续调理6个月后</div>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="prediction-icon">⚖️</div>
+                        <div class="prediction-metric">平衡态</div>
+                        <div class="prediction-label">预计体质调整目标</div>
+                        <div class="prediction-timeframe">血虚、寒凉体质改善</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 个性化提醒区 -->
+            <div class="reminder-section">
+                <div class="reminder-title">个性化健康提醒</div>
+                <div class="reminder-list">
+                    <div class="reminder-item">
+                        <div class="reminder-icon">👁️</div>
+                        <div class="reminder-content">
+                            <h4>眼部护理提醒</h4>
+                            <p>每2小时休息眼睛，避免长时间用眼，定期测量眼压</p>
+                        </div>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-icon">🍵</div>
+                        <div class="reminder-content">
+                            <h4>饮食禁忌提醒</h4>
+                            <p>避免油腻、辛辣、生冷食物，多食温补食材如生姜、红枣</p>
+                        </div>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-icon">🧘</div>
+                        <div class="reminder-content">
+                            <h4>情绪管理提醒</h4>
+                            <p>减少怒气，保持心情舒畅，适当冥想放松</p>
+                        </div>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-icon">🌡️</div>
+                        <div class="reminder-content">
+                            <h4>保暖提醒</h4>
+                            <p>注意保暖，避免贪凉，手脚易冷需特别防护</p>
+                        </div>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-icon">💊</div>
+                        <div class="reminder-content">
+                            <h4>营养补充提醒</h4>
+                            <p>重点补充钙、锌、维生素A、C、E</p>
+                        </div>
+                    </div>
+                    <div class="reminder-item">
+                        <div class="reminder-icon">🏃</div>
+                        <div class="reminder-content">
+                            <h4>运动建议提醒</h4>
+                            <p>适度运动如散步、太极，避免剧烈运动</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 趋势图表区 -->
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-title">核心指标历史与预测趋势</div>
+                    <div id="trendChart" class="chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">健康风险雷达图</div>
+                    <div id="riskRadarChart" class="chart"></div>
+                </div>
+                <div class="chart-container full-width">
+                    <div class="chart-title">各维度改善度预测曲线</div>
+                    <div id="dimensionTrendChart" class="chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">症状改善速度分析</div>
+                    <div id="symptomSpeedChart" class="chart"></div>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">体质调整预测</div>
+                    <div id="constitutionTrendChart" class="chart"></div>
+                </div>
+            </div>
+
+            <!-- 总结区 -->
+            <div class="summary-section">
+                <div class="summary-title">总体评估总结</div>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-value green">+169分</div>
+                        <div class="summary-label">30天综合改善度</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value green">3项</div>
+                        <div class="summary-label">高风险预警项</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value blue">6个月</div>
+                        <div class="summary-label">预计调理周期</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value green">85%</div>
+                        <div class="summary-label">调理方案匹配度</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 趋势图表
+        const trendChart = echarts.init(document.getElementById('trendChart'));
+        trendChart.setOption({
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['微循环', '血虚', '钙缺乏', '情绪指数', '免疫力'],
+                bottom: 0
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['12月13日', '1月13日', '2月预测', '3月预测', '4月预测', '5月预测', '6月预测'],
+                axisLabel: { rotate: 30 }
+            },
+            yAxis: {
+                type: 'value',
+                name: '评分'
+            },
+            series: [
+                {
+                    name: '微循环',
+                    type: 'line',
+                    data: [19, 15, 13, 11, 9, 8, 7],
+                    smooth: true,
+                    itemStyle: { color: '#FF6B6B' }
+                },
+                {
+                    name: '血虚',
+                    type: 'line',
+                    data: [15, 12, 10, 8, 7, 6, 5],
+                    smooth: true,
+                    itemStyle: { color: '#4ECDC4' },
+                    lineStyle: { type: 'dashed' }
+                },
+                {
+                    name: '钙缺乏',
+                    type: 'line',
+                    data: [15, 12, 10, 8, 6, 5, 4],
+                    smooth: true,
+                    itemStyle: { color: '#45B7D1' }
+                },
+                {
+                    name: '情绪指数',
+                    type: 'line',
+                    data: [27, 19, 14, 10, 7, 5, 3],
+                    smooth: true,
+                    itemStyle: { color: '#96CEB4' }
+                },
+                {
+                    name: '免疫力',
+                    type: 'line',
+                    data: [4, 6, 8, 10, 12, 14, 16],
+                    smooth: true,
+                    itemStyle: { color: '#FFEAA7' }
+                }
+            ]
+        });
+
+        // 风险雷达图
+        const riskRadarChart = echarts.init(document.getElementById('riskRadarChart'));
+        riskRadarChart.setOption({
+            tooltip: {},
+            legend: {
+                data: ['当前状态', '3个月后预测'],
+                bottom: 0
+            },
+            radar: {
+                indicator: [
+                    { name: '青光眼', max: 10 },
+                    { name: '高血压', max: 10 },
+                    { name: '糖尿病', max: 10 },
+                    { name: '失眠', max: 10 },
+                    { name: '肿瘤', max: 10 },
+                    { name: '营养不良', max: 10 }
+                ],
+                radius: '65%'
+            },
+            series: [{
+                name: '健康风险评估',
+                type: 'radar',
+                data: [
+                    {
+                        value: [8, 6, 6, 3, 3, 3],
+                        name: '当前状态',
+                        itemStyle: { color: '#FF6B6B' }
+                    },
+                    {
+                        value: [5, 4, 4, 2, 2, 1],
+                        name: '3个月后预测',
+                        itemStyle: { color: '#4ECDC4' },
+                        areaStyle: { opacity: 0.3 }
+                    }
+                ]
+            }]
+        });
+
+        // 各维度改善度预测曲线
+        const dimensionTrendChart = echarts.init(document.getElementById('dimensionTrendChart'));
+        dimensionTrendChart.setOption({
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['病因', '体质', '脏腑', '生活习惯', '情绪', '矿物质', '维生素'],
+                bottom: 0
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['12月13日', '1月13日', '2月', '3月', '4月', '5月', '6月']
+            },
+            yAxis: {
+                type: 'value',
+                name: '改善度评分（降低为改善）'
+            },
+            series: [
+                {
+                    name: '病因',
+                    type: 'line',
+                    data: [106, 87, 73, 62, 53, 46, 40],
+                    smooth: true,
+                    itemStyle: { color: '#FF6B6B' }
+                },
+                {
+                    name: '体质',
+                    type: 'line',
+                    data: [59, 39, 28, 20, 15, 12, 10],
+                    smooth: true,
+                    itemStyle: { color: '#4ECDC4' }
+                },
+                {
+                    name: '脏腑',
+                    type: 'line',
+                    data: [35, 32, 29, 26, 23, 21, 19],
+                    smooth: true,
+                    itemStyle: { color: '#45B7D1' }
+                },
+                {
+                    name: '生活习惯',
+                    type: 'line',
+                    data: [41, 31, 24, 19, 15, 12, 10],
+                    smooth: true,
+                    itemStyle: { color: '#96CEB4' }
+                },
+                {
+                    name: '情绪',
+                    type: 'line',
+                    data: [48, 27, 18, 12, 8, 5, 3],
+                    smooth: true,
+                    itemStyle: { color: '#FFEAA7' }
+                },
+                {
+                    name: '矿物质',
+                    type: 'line',
+                    data: [62, 46, 36, 29, 23, 19, 16],
+                    smooth: true,
+                    itemStyle: { color: '#DDA0DD' }
+                },
+                {
+                    name: '维生素',
+                    type: 'line',
+                    data: [101, 73, 57, 45, 36, 29, 24],
+                    smooth: true,
+                    itemStyle: { color: '#F0E68C' }
+                }
+            ]
+        });
+
+        // 症状改善速度分析
+        const symptomSpeedChart = echarts.init(document.getElementById('symptomSpeedChart'));
+        symptomSpeedChart.setOption({
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            legend: {
+                data: ['改善速度（分/月）'],
+                bottom: 0
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'value',
+                name: '改善速度'
+            },
+            yAxis: {
+                type: 'category',
+                data: ['情绪', '体质', '维生素', '矿物质', '病因', '生活习惯', '脏腑']
+            },
+            series: [
+                {
+                    name: '改善速度（分/月）',
+                    type: 'bar',
+                    data: [21, 20, 14, 16, 19, 10, 3],
+                    itemStyle: {
+                        color: function(params) {
+                            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#F0E68C'];
+                            return colors[params.dataIndex];
+                        }
+                    },
+                    label: {
+                        show: true,
+                        position: 'right',
+                        formatter: '{c}分/月'
+                    }
+                }
+            ]
+        });
+
+        // 体质调整预测
+        const constitutionTrendChart = echarts.init(document.getElementById('constitutionTrendChart'));
+        constitutionTrendChart.setOption({
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['血虚', '寒凉', '气虚', '阳虚', '阴虚'],
+                bottom: 0
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '10%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['12月13日', '1月13日', '2月', '3月', '4月', '5月', '6月']
+            },
+            yAxis: {
+                type: 'value',
+                name: '体质评分（降低为改善）'
+            },
+            series: [
+                {
+                    name: '血虚',
+                    type: 'line',
+                    data: [15, 12, 9, 7, 5, 4, 3],
+                    smooth: true,
+                    itemStyle: { color: '#FF6B6B' }
+                },
+                {
+                    name: '寒凉',
+                    type: 'line',
+                    data: [13, 10, 8, 6, 5, 4, 3],
+                    smooth: true,
+                    itemStyle: { color: '#4ECDC4' }
+                },
+                {
+                    name: '气虚',
+                    type: 'line',
+                    data: [13, 11, 9, 7, 6, 5, 4],
+                    smooth: true,
+                    itemStyle: { color: '#45B7D1' }
+                },
+                {
+                    name: '阳虚',
+                    type: 'line',
+                    data: [6, 4, 3, 2, 1, 1, 0],
+                    smooth: true,
+                    itemStyle: { color: '#96CEB4' }
+                },
+                {
+                    name: '阴虚',
+                    type: 'line',
+                    data: [6, 5, 4, 3, 2, 2, 1],
+                    smooth: true,
+                    itemStyle: { color: '#FFEAA7' }
+                }
+            ]
+        });
+
+        // 响应式调整
+        window.addEventListener('resize', function() {
+            trendChart.resize();
+            riskRadarChart.resize();
+            dimensionTrendChart.resize();
+            symptomSpeedChart.resize();
+            constitutionTrendChart.resize();
+        });
+    </script>
+</body>
+</html>

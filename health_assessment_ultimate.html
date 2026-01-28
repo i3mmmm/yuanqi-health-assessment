@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>元炁源流 · 健康自检评估系统</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary-gold: #C8A655;
+            --primary-dark: #1A1A1A;
+            --primary-light: #F8F6F2;
+            --text-primary: #2C2C2C;
+            --text-secondary: #666666;
+            --border-light: #E8E8E8;
+            --success: #52C41A;
+            --warning: #FAAD14;
+            --danger: #F5222D;
+        }
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #FAFAFA 0%, #F5F5F5 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, #2C2C2C 100%);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar-brand {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            letter-spacing: 3px;
+        }
+        .navbar-subtitle {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 1px;
+            font-weight: 300;
+            margin-top: 2px;
+        }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-tab {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-tab:hover, .nav-tab.active {
+            background: rgba(200, 166, 85, 0.3);
+            border-color: var(--primary-gold);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .page-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .page-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .section-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+        }
+        .section-title {
+            font-family: 'Noto Serif SC', serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: 4px;
+            margin-bottom: 8px;
+        }
+        .section-subtitle {
+            font-size: 13px;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 1px;
+        }
+        .summary-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        .summary-content {
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .summary-item {
+            padding: 0 20px;
+        }
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            margin-bottom: 5px;
+        }
+        .summary-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover {
+            border-color: var(--primary-gold);
+        }
+        .filter-btn.active {
+            background: var(--primary-gold);
+            color: white;
+            border-color: var(--primary-gold);
+        }
+        .symptoms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .symptom-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .symptom-card:hover {
+            border-color: var(--primary-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(200, 166, 85, 0.2);
+        }
+        .symptom-card.selected {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, #D4B86A 100%);
+            border-color: var(--primary-gold);
+        }
+        .symptom-card.selected .symptom-name {
+            color: white;
+        }
+        .symptom-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .severity-levels {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .severity-btn {
+            flex: 1;
+            padding: 6px 4px;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .severity-btn:hover {
+            border-color: var(--primary-gold);
+        }
+        .severity-btn.active {
+            background: var(--primary-gold);
+            color: white;
+            border-color: var(--primary-gold);
+        }
+        .severity-btn.mild.active {
+            background: #52C41A;
+        }
+        .severity-btn.moderate.active {
+            background: #FAAD14;
+        }
+        .severity-btn.severe.active {
+            background: #F5222D;
+        }
+        .notes-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        .notes-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+        .notes-textarea:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 3px rgba(200, 166, 85, 0.1);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-gold) 0%, #D4B86A 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(200, 166, 85, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(200, 166, 85, 0.4);
+        }
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+        .btn-secondary:hover {
+            border-color: var(--primary-gold);
+            background: rgba(200, 166, 85, 0.05);
+        }
+        .assessment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .assessment-item {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        .assessment-item:hover {
+            border-color: var(--primary-gold);
+            transform: translateY(-2px);
+        }
+        .assessment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .assessment-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        .assessment-code {
+            font-size: 12px;
+            color: var(--primary-gold);
+            font-weight: 500;
+        }
+        .assessment-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .assessment-stat {
+            text-align: center;
+            padding: 10px;
+            background: var(--primary-light);
+            border-radius: 6px;
+        }
+        .assessment-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            margin-bottom: 3px;
+        }
+        .assessment-stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .assessment-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .assessment-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .loading-spinner {
+            background: white;
+            padding: 40px 60px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-light);
+            border-top-color: var(--primary-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 3000;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+        .notification.active {
+            display: block;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+        .notification.error {
+            border-left: 4px solid var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div>
+            <div class="navbar-brand">元炁源流</div>
+            <div class="navbar-subtitle">健康自检评估系统</div>
+        </div>
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="switchTab('assessment')">健康自检</div>
+            <div class="nav-tab" onclick="switchTab('history')">评估记录</div>
+        </div>
+    </nav>
+
+    <!-- 健康自检页面 -->
+    <div id="assessment-section" class="page-section active">
+        <div class="container">
+            <div class="section-header">
+                <h1 class="section-title">健康自检评估</h1>
+                <p class="section-subtitle">HEALTH SELF-ASSESSMENT</p>
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-symptoms">0</div>
+                    <div class="stat-label">总症状数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="selected-count">0</div>
+                    <div class="stat-label">已选择</div>
+                </div>
+            </div>
+
+            <!-- 已选症状汇总 -->
+            <div class="summary-card">
+                <div class="card-header">
+                    <div class="card-title">已选症状汇总</div>
+                </div>
+                <div class="summary-content">
+                    <div class="summary-item">
+                        <div class="summary-value" id="selected-symptoms-count">0</div>
+                        <div class="summary-label">已选择</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="mild-count">0</div>
+                        <div class="summary-label">轻度</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="moderate-count">0</div>
+                        <div class="summary-label">中度</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value" id="severe-count">0</div>
+                        <div class="summary-label">重度</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 筛选按钮 -->
+            <div class="filter-buttons">
+                <div class="filter-btn active" onclick="filterSymptoms('all')">显示全部</div>
+                <div class="filter-btn" onclick="filterSymptoms('selected')">仅显示已选</div>
+                <div class="filter-btn" onclick="filterSymptoms('unselected')">仅显示未选</div>
+            </div>
+
+            <!-- 症状列表 -->
+            <div class="symptoms-grid" id="symptoms-grid">
+                <!-- 动态生成症状卡片 -->
+            </div>
+
+            <!-- 调理方案及备注 -->
+            <div class="notes-card">
+                <div class="card-header">
+                    <div class="card-title">调理方案及备注</div>
+                </div>
+                <textarea class="notes-textarea" id="notes-input" placeholder="请输入调理方案或相关备注..."></textarea>
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="clearAll()">清空所有</button>
+                    <button class="btn btn-primary" onclick="submitAssessment()">提交评估</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 评估记录页面 -->
+    <div id="history-section" class="page-section">
+        <div class="container">
+            <div class="section-header">
+                <h1 class="section-title">评估记录</h1>
+                <p class="section-subtitle">ASSESSMENT HISTORY</p>
+            </div>
+
+            <!-- 统计信息 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-assessments">0</div>
+                    <div class="stat-label">总评估数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="today-assessments">0</div>
+                    <div class="stat-label">今日评估</div>
+                </div>
+            </div>
+
+            <!-- 评估列表 -->
+            <div class="assessment-list" id="assessment-list">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <div>暂无评估记录</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div id="loading-text">正在处理...</div>
+        </div>
+    </div>
+
+    <!-- 通知提示 -->
+    <div class="notification" id="notification">
+        <div id="notification-text"></div>
+    </div>
+
+    <script>
+        // 状态管理
+        let symptoms = [];
+        let selectedSymptoms = {};
+        let currentFilter = 'all';
+        let assessments = [];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSymptoms();
+            loadAssessments();
+        });
+
+        // 加载症状数据
+        function loadSymptoms() {
+            showLoading('加载症状数据...');
+
+            // 使用本地 JSON 文件
+            fetch('symptoms_299_complete.json')
+                .then(response => response.json())
+                .then(data => {
+                    symptoms = data;
+                    renderSymptoms();
+                    updateStats();
+                    hideLoading();
+                })
+                .catch(error => {
+                    console.error('加载症状数据失败:', error);
+                    showNotification('加载症状数据失败，请刷新页面重试', 'error');
+                    hideLoading();
+                });
+        }
+
+        // 加载评估记录
+        function loadAssessments() {
+            showLoading('加载评估记录...');
+
+            // 尝试从本地存储读取
+            const storedAssessments = localStorage.getItem('yuanqi_assessments');
+            if (storedAssessments) {
+                assessments = JSON.parse(storedAssessments);
+            }
+
+            renderAssessments();
+            updateHistoryStats();
+            hideLoading();
+        }
+
+        // 渲染症状列表
+        function renderSymptoms() {
+            const grid = document.getElementById('symptoms-grid');
+            grid.innerHTML = '';
+
+            let filteredSymptoms = symptoms;
+
+            // 根据筛选条件过滤
+            if (currentFilter === 'selected') {
+                filteredSymptoms = symptoms.filter(s => selectedSymptoms[s.name]);
+            } else if (currentFilter === 'unselected') {
+                filteredSymptoms = symptoms.filter(s => !selectedSymptoms[s.name]);
+            }
+
+            filteredSymptoms.forEach(symptom => {
+                const selected = selectedSymptoms[symptom.name];
+                const severity = selected ? selected.severity : null;
+
+                const card = document.createElement('div');
+                card.className = `symptom-card ${selected ? 'selected' : ''}`;
+                card.onclick = (e) => toggleSymptom(symptom.name, e);
+
+                card.innerHTML = `
+                    <div class="symptom-name">${symptom.name}</div>
+                    <div class="severity-levels">
+                        <button class="severity-btn mild ${severity === 'mild' ? 'active' : ''}"
+                                onclick="setSeverity('${symptom.name}', 'mild', event)">
+                            轻度
+                        </button>
+                        <button class="severity-btn moderate ${severity === 'moderate' ? 'active' : ''}"
+                                onclick="setSeverity('${symptom.name}', 'moderate', event)">
+                            中度
+                        </button>
+                        <button class="severity-btn severe ${severity === 'severe' ? 'active' : ''}"
+                                onclick="setSeverity('${symptom.name}', 'severe', event)">
+                            重度
+                        </button>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            // 更新总数显示
+            document.getElementById('total-symptoms').textContent = symptoms.length;
+        }
+
+        // 切换症状选择
+        function toggleSymptom(symptomName, event) {
+            if (event.target.classList.contains('severity-btn')) {
+                return; // 如果点击的是严重程度按钮，不触发选择切换
+            }
+
+            if (selectedSymptoms[symptomName]) {
+                delete selectedSymptoms[symptomName];
+            } else {
+                selectedSymptoms[symptomName] = {
+                    severity: 'mild',
+                    intensity: 1
+                };
+            }
+
+            renderSymptoms();
+            updateStats();
+        }
+
+        // 设置严重程度
+        function setSeverity(symptomName, severity, event) {
+            event.stopPropagation();
+
+            if (!selectedSymptoms[symptomName]) {
+                selectedSymptoms[symptomName] = {};
+            }
+
+            selectedSymptoms[symptomName].severity = severity;
+            selectedSymptoms[symptomName].intensity = severity === 'mild' ? 1 : severity === 'moderate' ? 2 : 3;
+
+            renderSymptoms();
+            updateStats();
+        }
+
+        // 更新统计信息
+        function updateStats() {
+            const selectedCount = Object.keys(selectedSymptoms).length;
+            let mildCount = 0;
+            let moderateCount = 0;
+            let severeCount = 0;
+
+            Object.values(selectedSymptoms).forEach(s => {
+                if (s.severity === 'mild') mildCount++;
+                else if (s.severity === 'moderate') moderateCount++;
+                else if (s.severity === 'severe') severeCount++;
+            });
+
+            document.getElementById('selected-count').textContent = selectedCount;
+            document.getElementById('selected-symptoms-count').textContent = selectedCount;
+            document.getElementById('mild-count').textContent = mildCount;
+            document.getElementById('moderate-count').textContent = moderateCount;
+            document.getElementById('severe-count').textContent = severeCount;
+        }
+
+        // 筛选症状
+        function filterSymptoms(filter) {
+            currentFilter = filter;
+
+            // 更新按钮状态
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            renderSymptoms();
+        }
+
+        // 清空所有选择
+        function clearAll() {
+            if (Object.keys(selectedSymptoms).length === 0) {
+                showNotification('暂无已选症状', 'error');
+                return;
+            }
+
+            if (confirm('确定要清空所有已选症状吗？')) {
+                selectedSymptoms = {};
+                document.getElementById('notes-input').value = '';
+                renderSymptoms();
+                updateStats();
+                showNotification('已清空所有选择', 'success');
+            }
+        }
+
+        // 提交评估
+        function submitAssessment() {
+            if (Object.keys(selectedSymptoms).length === 0) {
+                showNotification('请至少选择一个症状', 'error');
+                return;
+            }
+
+            showLoading('正在提交评估...');
+
+            // 构建评估数据
+            const assessmentData = {
+                id: Date.now(),
+                assessment_code: `YA${new Date().toISOString().slice(0,10).replace(/-/g,'')}${String(Math.floor(Math.random() * 10000)).padStart(4,'0')}`,
+                real_name: '访客',
+                age: 0,
+                gender: '未知',
+                symptoms: Object.entries(selectedSymptoms).map(([name, data]) => ({
+                    name: name,
+                    intensity: data.intensity,
+                    severity_level: data.severity
+                })),
+                total_symptoms: Object.keys(selectedSymptoms).length,
+                total_score: Object.values(selectedSymptoms).reduce((sum, s) => sum + s.intensity, 0),
+                avg_score: Object.values(selectedSymptoms).reduce((sum, s) => sum + s.intensity, 0) / Object.keys(selectedSymptoms).length,
+                notes: document.getElementById('notes-input').value,
+                created_at: new Date().toISOString()
+            };
+
+            // 保存到本地存储
+            assessments.unshift(assessmentData);
+            localStorage.setItem('yuanqi_assessments', JSON.stringify(assessments));
+
+            // 清空选择
+            selectedSymptoms = {};
+            document.getElementById('notes-input').value = '';
+            renderSymptoms();
+            updateStats();
+
+            // 更新评估记录页面
+            renderAssessments();
+            updateHistoryStats();
+
+            hideLoading();
+            showNotification('评估提交成功！', 'success');
+
+            // 切换到评估记录页面
+            setTimeout(() => {
+                switchTab('history');
+            }, 1500);
+        }
+
+        // 渲染评估记录
+        function renderAssessments() {
+            const list = document.getElementById('assessment-list');
+
+            if (assessments.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📋</div>
+                        <div>暂无评估记录</div>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = assessments.map(assessment => {
+                const date = new Date(assessment.created_at);
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')} ${String(date.getHours()).padStart(2,'0')}:${String(date.getMinutes()).padStart(2,'0')}`;
+
+                // 统计严重程度
+                let mildCount = 0;
+                let moderateCount = 0;
+                let severeCount = 0;
+
+                assessment.symptoms.forEach(s => {
+                    if (s.severity_level === '轻度') mildCount++;
+                    else if (s.severity_level === '中度') moderateCount++;
+                    else if (s.severity_level === '重度') severeCount++;
+                });
+
+                return `
+                    <div class="assessment-item">
+                        <div class="assessment-header">
+                            <div class="assessment-name">${assessment.real_name}</div>
+                            <div class="assessment-code">${assessment.assessment_code}</div>
+                        </div>
+                        <div class="assessment-stats">
+                            <div class="assessment-stat">
+                                <div class="assessment-stat-value">${assessment.total_symptoms}</div>
+                                <div class="assessment-stat-label">症状数</div>
+                            </div>
+                            <div class="assessment-stat">
+                                <div class="assessment-stat-value" style="color: #52C41A">${mildCount}</div>
+                                <div class="assessment-stat-label">轻度</div>
+                            </div>
+                            <div class="assessment-stat">
+                                <div class="assessment-stat-value" style="color: #FAAD14">${moderateCount}</div>
+                                <div class="assessment-stat-label">中度</div>
+                            </div>
+                            <div class="assessment-stat">
+                                <div class="assessment-stat-value" style="color: #F5222D">${severeCount}</div>
+                                <div class="assessment-stat-label">重度</div>
+                            </div>
+                        </div>
+                        <div class="assessment-footer">
+                            <div class="assessment-date">${dateStr}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 更新历史统计
+        function updateHistoryStats() {
+            document.getElementById('total-assessments').textContent = assessments.length;
+
+            // 计算今日评估
+            const today = new Date().toISOString().slice(0, 10);
+            const todayCount = assessments.filter(a => a.created_at.startsWith(today)).length;
+            document.getElementById('today-assessments').textContent = todayCount;
+        }
+
+        // 切换标签页
+        function switchTab(tab) {
+            // 更新标签页状态
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // 更新页面显示
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`${tab}-section`).classList.add('active');
+        }
+
+        // 显示加载
+        function showLoading(text) {
+            document.getElementById('loading-text').textContent = text;
+            document.getElementById('loading-overlay').classList.add('active');
+        }
+
+        // 隐藏加载
+        function hideLoading() {
+            document.getElementById('loading-overlay').classList.remove('active');
+        }
+
+        // 显示通知
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notification-text');
+
+            notification.className = `notification ${type}`;
+            text.textContent = message;
+
+            notification.classList.add('active');
+
+            setTimeout(() => {
+                notification.classList.remove('active');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

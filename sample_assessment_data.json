@@ -1,0 +1,323 @@
+{
+  "customer_info": {
+    "name": "张女士",
+    "age": 35,
+    "gender": "女",
+    "assessment_date": "2026年01月27日",
+    "contact": "138****8888"
+  },
+  "selected_symptoms": [
+    {
+      "id": 47,
+      "name": "鼻子干燥",
+      "colorRegion": "red",
+      "organ": "心、小肠",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "干燥环境"
+        },
+        {
+          "label": "营养",
+          "detail": "维生素缺乏"
+        },
+        {
+          "label": "习惯",
+          "detail": "过度清洁"
+        },
+        {
+          "label": "体质",
+          "detail": "阴虚"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        }
+      ],
+      "warnings": [
+        "注意鼻腔健康"
+      ],
+      "taboos": [
+        "忌干燥",
+        "注意保湿"
+      ],
+      "severity": "mild"
+    },
+    {
+      "id": 84,
+      "name": "眼睛灼热",
+      "colorRegion": "green",
+      "organ": "肝、胆",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "眼部炎症"
+        },
+        {
+          "label": "习惯",
+          "detail": "用眼过度"
+        },
+        {
+          "label": "体质",
+          "detail": "肝火旺"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        },
+        {
+          "label": "微循环",
+          "detail": "局部充血"
+        }
+      ],
+      "warnings": [
+        "注意眼部炎症"
+      ],
+      "taboos": [
+        "避免用眼过度",
+        "注意休息"
+      ],
+      "severity": "mild"
+    },
+    {
+      "id": 153,
+      "name": "咳嗽伴呼吸困难",
+      "colorRegion": "white",
+      "organ": "肺、大肠",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "肺部疾病"
+        },
+        {
+          "label": "循环",
+          "detail": "血液循环不畅"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        },
+        {
+          "label": "体质",
+          "detail": "肺虚"
+        },
+        {
+          "label": "微循环",
+          "detail": "血液循环不畅"
+        },
+        {
+          "label": "循环",
+          "detail": "血液循环不畅"
+        }
+      ],
+      "warnings": [
+        "注意肺部疾病",
+        "需立即就医"
+      ],
+      "taboos": [
+        "忌烟酒",
+        "立即就医"
+      ],
+      "severity": "severe"
+    },
+    {
+      "id": 161,
+      "name": "咳嗽伴焦虑",
+      "colorRegion": "white",
+      "organ": "肺、大肠",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "肺部疾病"
+        },
+        {
+          "label": "循环",
+          "detail": "血液循环不畅"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        },
+        {
+          "label": "体质",
+          "detail": "肺虚"
+        },
+        {
+          "label": "微循环",
+          "detail": "血液循环不畅"
+        },
+        {
+          "label": "循环",
+          "detail": "血液循环不畅"
+        }
+      ],
+      "warnings": [
+        "注意肺部疾病"
+      ],
+      "taboos": [
+        "忌烟酒",
+        "避免受凉"
+      ],
+      "severity": "moderate"
+    },
+    {
+      "id": 183,
+      "name": "大便带脓",
+      "colorRegion": "black",
+      "organ": "肾、膀胱",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "肠道感染"
+        },
+        {
+          "label": "循环",
+          "detail": "血液循环不畅"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        },
+        {
+          "label": "体质",
+          "detail": "脾胃虚弱"
+        },
+        {
+          "label": "习惯",
+          "detail": "饮食不当"
+        },
+        {
+          "label": "微循环",
+          "detail": "血液循环不畅"
+        }
+      ],
+      "warnings": [
+        "注意肠道感染",
+        "需立即就医"
+      ],
+      "taboos": [
+        "忌油腻寒凉",
+        "立即就医"
+      ],
+      "severity": "severe"
+    },
+    {
+      "id": 194,
+      "name": "肛瘘",
+      "colorRegion": "black",
+      "organ": "肾、膀胱",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "肛周脓肿"
+        },
+        {
+          "label": "循环",
+          "detail": "血液循环不畅"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        },
+        {
+          "label": "体质",
+          "detail": "气血两虚"
+        },
+        {
+          "label": "习惯",
+          "detail": "久坐"
+        },
+        {
+          "label": "微循环",
+          "detail": "血液循环不畅"
+        }
+      ],
+      "warnings": [
+        "注意肛瘘",
+        "需立即就医"
+      ],
+      "taboos": [
+        "忌辛辣刺激",
+        "立即就医"
+      ],
+      "severity": "severe"
+    },
+    {
+      "id": 226,
+      "name": "胃部痉挛",
+      "colorRegion": "yellow",
+      "organ": "脾、胃",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "胃炎"
+        },
+        {
+          "label": "习惯",
+          "detail": "饮食不当"
+        },
+        {
+          "label": "体质",
+          "detail": "脾胃虚弱"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        },
+        {
+          "label": "微循环",
+          "detail": "血液循环不畅"
+        }
+      ],
+      "warnings": [
+        "注意胃炎"
+      ],
+      "taboos": [
+        "忌辛辣",
+        "规律饮食"
+      ],
+      "severity": "mild"
+    },
+    {
+      "id": 270,
+      "name": "经前情绪波动",
+      "colorRegion": "blue",
+      "organ": "妇科系统",
+      "causes": [
+        {
+          "label": "毒素",
+          "detail": "内分泌失调"
+        },
+        {
+          "label": "习惯",
+          "detail": "熬夜"
+        },
+        {
+          "label": "体质",
+          "detail": "肝郁脾虚"
+        },
+        {
+          "label": "免疫力",
+          "detail": "免疫力低下"
+        },
+        {
+          "label": "微循环",
+          "detail": "血液循环不畅"
+        },
+        {
+          "label": "压力",
+          "detail": "情绪压力"
+        }
+      ],
+      "warnings": [
+        "注意内分泌问题"
+      ],
+      "taboos": [
+        "忌辛辣",
+        "调节情绪"
+      ],
+      "severity": "mild"
+    }
+  ],
+  "symptom_count": 8
+}
