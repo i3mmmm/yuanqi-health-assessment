@@ -28,7 +28,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 静态文件服务（用于访问上传的文件）
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+31:app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+32:app.use(express.static(path.join(__dirname)));
+33:app.get("/", (req, res) => { res.sendFile(path.join(__dirname, "health_assessment_backend_complete.html")); });
 
 // 配置文件上传
 const storage = multer.diskStorage({
