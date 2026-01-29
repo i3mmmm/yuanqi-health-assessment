@@ -601,7 +601,7 @@
             fetch('symptoms_299_complete.json')
                 .then(response => response.json())
                 .then(data => {
-                    symptoms = data;
+                    symptoms = data.symptoms || data;  
                     renderSymptoms();
                     updateStats();
                     hideLoading();
