@@ -785,6 +785,42 @@
                 notes: document.getElementById('notes-input').value,
                 created_at: new Date().toISOString()
             };
+            // 发送到后端服务器  
+            fetch('/api/assessments', {  
+                method: 'POST',  
+                headers: {  
+                    'Content-Type': 'application/json'  
+                },  
+                body: JSON.stringify({  
+                    user_id: 'guest_' + Date.now(),  
+                    real_name: '访客',  
+                    age: 0,  
+                    gender: '未知',  
+                    height: 0,  
+                    weight: 0,  
+                    waist_circumference: 0,  
+                    blood_sugar: 0,  
+                    systolic_pressure: 0,  
+                    diastolic_pressure: 0,  
+                    remarks: document.getElementById('notes-input').value,  
+                    symptoms: Object.entries(selectedSymptoms).map(([name, data]) => ({  
+                        name: name,  
+                        intensity: data.intensity || 0,  
+                        severity_level: data.severity  
+                    }))  
+                })  
+            })  
+            .then(response => response.json())  
+            .then(result => {  
+                if (result.code === 200) {  
+                    console.log('评估已保存到服务器:', result);  
+                } else {  
+                    console.error('保存到服务器失败:', result.message);  
+                }  
+            })  
+            .catch(error => {  
+                console.error('发送到服务器失败:', error);  
+            });  
 
             // 保存到本地存储
             assessments.unshift(assessmentData);
