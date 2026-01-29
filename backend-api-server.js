@@ -1780,7 +1780,7 @@ app.get('/api/admin/assessments', authenticateToken, requirePractitioner, async 
 });
 // 根路由 - 返回主页表单  
 app.get('/', (req, res) => {  
-    res.sendFile(path.join(__dirname, 'health_assessment_diagnostic.html'));  
+    res.sendFile(path.join(__dirname, 'health_assessment_ultimate.html'));  
 });  
 
 // 健康检查
