@@ -1194,7 +1194,7 @@ app.get('/api/symptoms', async (req, res) => {
         }
 
         query += ' ORDER BY id LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), offset);
+        params.push(parseInt(limit), parseInt(offset));  
 
         const [symptoms] = await dbPool.execute(query, params);
         const [countResult] = await dbPool.execute(countQuery, countParams);
