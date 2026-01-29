@@ -1795,6 +1795,7 @@ app.use((err, req, res, next) => {
 });
 
 // 启动服务器
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`元炁源流健康评估系统 - 后端API服务已启动`);
     console.log(`服务地址: http://localhost:${PORT}`);
