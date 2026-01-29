@@ -15,7 +15,7 @@ const puppeteer = require('puppeteer');
 
 // 初始化Express应用
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // 配置CORS
 app.use(cors({
