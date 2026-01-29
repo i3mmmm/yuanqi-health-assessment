@@ -549,38 +549,17 @@
     </div>
     
     <script>// 页面加载时获取评估数据  
-document.addEventListener('DOMContentLoaded', function() {  
-    loadAssessmentsFromAPI();  
-});  
-// 从后端 API 加载评估数据  
-async function loadAssessmentsFromAPI() {  
-    try {  
-        const response = await fetch('/api/assessments');  
-        const result = await response.json();  
-          
-        if (result.code === 200 && result.data && result.data.assessments) {  
-            // 将 API 返回的数据转换为前端期望的格式  
-            window.allAssessments = result.data.assessments.map(assessment => ({  
-                id: assessment.id,  
-                assessment_code: assessment.assessment_code,  
-                基本信息: {  
-                    姓名: assessment.real_name,  
-                    年龄: assessment.age,  
-                    性别: assessment.gender,  
-                    身高: assessment.height,  
-                    体重: assessment.weight,  
-                    腰围: assessment.waist_circumference,  
-                    收缩压: assessment.systolic_pressure,  
-                    舒张压: assessment.diastolic_pressure,  
-                    血糖: assessment.blood_sugar  
-                },  
-                评估日期: assessment.assessment_date,  
-                已选择症状: [],  
-                总症状数: assessment.total_symptoms,  
-                总分数: assessment.total_score,  
-                平均分数: assessment.avg_score,  
-                备注: assessment.remarks  
-            }));  
+window.addEventListener('load', function() {  
+    fetch('/api/assessments')  
+        .then(r => r.json())  
+        .then(data => {  
+            if (data.code === 200 && data.data && data.data.assessments) {  
+                window.allAssessments = data.data.assessments;  
+                console.log('成功加载评估数据');  
+            }  
+        })  
+        .catch(e => console.error('加载失败:', e));  
+});    
               
             console.log('成功加载评估数据:', window.allAssessments);  
         } else {  
