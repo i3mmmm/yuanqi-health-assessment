@@ -1778,6 +1778,10 @@ app.get('/api/admin/assessments', authenticateToken, requirePractitioner, async 
         res.status(500).json({ code: 500, message: '获取评估列表失败: ' + error.message });
     }
 });
+// 根路由 - 返回主页表单  
+app.get('/', (req, res) => {  
+    res.sendFile(path.join(__dirname, 'health_assessment_backend_complete.html'));  
+});  
 
 // 健康检查
 app.get('/api/health', (req, res) => {
