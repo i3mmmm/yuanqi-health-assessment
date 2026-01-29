@@ -15,7 +15,7 @@ const puppeteer = require('puppeteer');
 
 // 初始化Express应用
 const app = express();
-const port = process.env.PORT || 3000;  
+const port = process.env.PORT || 8080;  
 
 // 配置CORS
 app.use(cors({
@@ -29,6 +29,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 静态文件服务（用于访问上传的文件）
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(__dirname)));
 
 // 配置文件上传
 const storage = multer.diskStorage({
