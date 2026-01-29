@@ -3,7 +3,7 @@
 
 // ==================== 全局配置 ====================
 const API_CONFIG = {
-    baseURL: 'http://localhost:3000', // 生产环境改为实际API域名
+   baseURL: window.location.origin, // 使用当前域名作为API基础地址  
     endpoints: {
         register: '/api/auth/register',
         login: '/api/auth/login',
@@ -528,7 +528,7 @@ async function initSymptomsData() {
  * 从本地JSON文件加载症状
  */
 function loadSymptomsFromLocal() {
-    fetch('symptoms_299_complete.json')
+    fetch('/symptoms_299_complete.json')  
         .then(response => response.json())
         .then(data => {
             if (data && data.symptoms) {
