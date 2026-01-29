@@ -1140,7 +1140,7 @@ app.get('/api/assessments', async (req, res) => {
         }
 
         query += ' ORDER BY assessment_date DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), offset);
+        params.push(parseInt(limit), parseInt(offset));    
 
         const [assessments] = await dbPool.execute(query, params);
         const [countResult] = await dbPool.execute(countQuery, countParams);
@@ -1744,7 +1744,7 @@ app.get('/api/admin/assessments', authenticateToken, requirePractitioner, async 
         }
 
         query += ' ORDER BY a.assessment_date DESC LIMIT ? OFFSET ?';
-        params.push(parseInt(limit), offset);
+        params.push(parseInt(limit), parseInt(offset));  
 
         const [assessments] = await dbPool.execute(query, params);
         const [countResult] = await dbPool.execute(countQuery, countParams);
