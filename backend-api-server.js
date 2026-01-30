@@ -911,9 +911,14 @@ app.post('/api/assessments', async (req, res) => {
         } = req.body;
 
         // 验证必填字段
-        if (!user_id || !real_name || !age || !gender) {
-            return res.status(400).json({ code: 400, message: '缺少必填字段' });
-        }
+        // 验证必填字段  
+if (user_id === null || user_id === undefined ||   
+    !real_name ||   
+    age === null || age === undefined ||   
+    !gender) {  
+    return res.status(400).json({ code: 400, message: '缺少必填字段' });  
+}  
+
 
         if (!symptoms || !Array.isArray(symptoms) || symptoms.length === 0) {
             return res.status(400).json({ code: 400, message: '至少选择一个症状' });
