@@ -1124,7 +1124,7 @@ app.get('/api/assessments/:assessment_id', async (req, res) => {
 // 获取用户评估列表  
 app.get('/api/assessments', async (req, res) => {  
     try {  
-        const user_id = req.query.user_id || null;  
+        const user_id = req.query.user_id ? parseInt(req.query.user_id) : null;    
         const page = req.query.page ? parseInt(req.query.page) : 1;  
         const limit = req.query.limit ? parseInt(req.query.limit) : 20;  
         const offset = (page - 1) * limit;   
@@ -1135,7 +1135,7 @@ app.get('/api/assessments', async (req, res) => {
         if (user_id) {  
             query += ' WHERE user_id = ?';  
             countQuery += ' WHERE user_id = ?';  
-            params.push(user_id);  
+            params.push(user_id);    
             countParams.push(user_id);  
         }  
         
