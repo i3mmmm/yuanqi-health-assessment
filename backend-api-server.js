@@ -1130,15 +1130,13 @@ app.get('/api/assessments', async (req, res) => {
         const offset = (page - 1) * limit;  
         let query = 'SELECT * FROM assessments';  
         let countQuery = 'SELECT COUNT(*) as total FROM assessments';  
-        let params = [];  
-        let countParams = [];  
         if (user_id) {  
             query += ' WHERE user_id = ' + user_id;  
             countQuery += ' WHERE user_id = ' + user_id;  
         }  
         query += ' ORDER BY assessment_date DESC LIMIT ' + limit + ' OFFSET ' + offset;  
-        const [assessments] = await dbPool.execute(query);  
-        const [countResult] = await dbPool.execute(countQuery);  
+        const [assessments] = await dbPool.query(query);  
+        const [countResult] = await dbPool.query(countQuery);  
         const total = countResult[0].total;  
         res.json({  
             code: 200,  
