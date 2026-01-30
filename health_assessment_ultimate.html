@@ -785,6 +785,38 @@
                 notes: document.getElementById('notes-input').value,
                 created_at: new Date().toISOString()
             };
+            // 检查是否选择了症状  
+if (Object.keys(selectedSymptoms).length === 0) {  
+    showNotification('请至少选择一个症状', 'error');  
+    return;  
+}  
+            
+// 发送到后端服务器  
+fetch('/api/assessments', {  
+    method: 'POST',  
+    headers: {  
+        'Content-Type': 'application/json'  
+    },  
+    body: JSON.stringify({  
+        user_id: Math.floor(Date.now() / 1000),  
+        real_name: '访客',  
+        age: 0,  
+        gender: '未知',  
+        height: 0,  
+        weight: 0,  
+        waist_circumference: 0,  
+        blood_sugar: 0,  
+        systolic_pressure: 0,  
+        diastolic_pressure: 0,  
+        remarks: document.getElementById('notes-input').value || '',  
+        symptoms: Object.keys(selectedSymptoms).map(symptomName => ({  
+            name: symptomName,  
+            intensity: selectedSymptoms[symptomName].intensity || 0,  
+            severity_level: selectedSymptoms[symptomName].severity || 'mild'  
+        }))  
+    })  
+})  
+
             // 发送到后端服务器  
             fetch('/api/assessments', {  
                 method: 'POST',  
