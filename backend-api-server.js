@@ -1139,7 +1139,7 @@ app.get('/api/assessments', async (req, res) => {
             countParams.push(user_id);  
         }  
         query += ' ORDER BY assessment_date DESC LIMIT ? OFFSET ?';  
-        params.push(limit, offset);  
+          
         const [assessments] = await dbPool.execute(query, params);  
         const [countResult] = await dbPool.execute(countQuery, countParams);  
         const total = countResult[0].total;  
