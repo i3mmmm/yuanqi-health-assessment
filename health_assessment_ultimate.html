@@ -773,7 +773,7 @@
                 assessment_code: `YA${new Date().toISOString().slice(0,10).replace(/-/g,'')}${String(Math.floor(Math.random() * 10000)).padStart(4,'0')}`,
                 real_name: '访客',
                 age: 0,
-                gender: '未知',
+                gender: document.getElementById('gender-input')?.value || '未知',
                 symptoms: Object.entries(selectedSymptoms).map(([name, data]) => ({
                     name: name,
                     intensity: data.intensity,
@@ -801,7 +801,7 @@ fetch('/api/assessments', {
         user_id: Math.floor(Date.now() / 1000),  
         real_name: '访客',  
         age: 0,  
-        gender: '未知',  
+        gender: document.getElementById('gender-input')?.value || '未知',  
         height: 0,  
         weight: 0,  
         waist_circumference: 0,  
