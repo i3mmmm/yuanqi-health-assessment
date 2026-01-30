@@ -1121,52 +1121,44 @@ app.get('/api/assessments/:assessment_id', async (req, res) => {
     }
 });
 
-// 获取用户评估列表
+// 获取用户评估列表  
 app.get('/api/assessments', async (req, res) => {  
     try {  
         const user_id = req.query.user_id;  
         const page = parseInt(req.query.page) || 1;  
         const limit = parseInt(req.query.limit) || 20;  
-
-        const offset = (page - 1) * limit;
-
-        let query = 'SELECT * FROM assessments';
-        let countQuery = 'SELECT COUNT(*) as total FROM assessments';
-        let params = [];
-        let countParams = [];
-
-        if (user_id) {
-            query += ' WHERE user_id = ?';
-            countQuery += ' WHERE user_id = ?';
-            params.push(user_id);
-            countParams.push(user_id);
-        }
-
-        query += ' ORDER BY assessment_date DESC LIMIT ? OFFSET ?';
+        const offset = (page - 1) * limit;  
+        let query = 'SELECT * FROM assessments';  
+        let countQuery = 'SELECT COUNT(*) as total FROM assessments';  
+        let params = [];  
+        let countParams = [];  
+        if (user_id) {  
+            query += ' WHERE user_id = ?';  
+            countQuery += ' WHERE user_id = ?';  
+            params.push(user_id);  
+            countParams.push(user_id);  
+        }  
+        query += ' ORDER BY assessment_date DESC LIMIT ? OFFSET ?';  
         params.push(limit, offset);  
-    
+        const [assessments] = await dbPool.execute(query, params);  
+        const [countResult] = await dbPool.execute(countQuery, countParams);  
+        const total = countResult[0].total;  
+        res.json({  
+            code: 200,  
+            message: '获取成功',  
+            data: {  
+                total: total,  
+                page: page,  
+                limit: limit,  
+                assessments: assessments  
+            }  
+        });  
+    } catch (error) {  
+        console.error('获取评估列表失败:', error);  
+        res.status(500).json({ code: 500, message: '获取评估列表失败: ' + error.message });  
+    }  
+});  
 
-        const [assessments] = await dbPool.execute(query, params);
-        const [countResult] = await dbPool.execute(countQuery, countParams);
-
-        const total = countResult[0].total;
-
-        res.json({
-            code: 200,
-            message: '获取成功',
-            data: {
-                total: total,
-                page: parseInt(page),
-                limit: parseInt(limit),
-                assessments: assessments
-            }
-        });
-
-    } catch (error) {
-        console.error('获取评估列表失败:', error);
-        res.status(500).json({ code: 500, message: '获取评估列表失败: ' + error.message });
-    }
-});
 
 // 3. 症状库API
 
