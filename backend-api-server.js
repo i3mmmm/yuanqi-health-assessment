@@ -925,11 +925,15 @@ app.post('/api/assessments', async (req, res) => {
     remarks,  
     symptoms  
 } = req.body;  
-// 转换性别字段  
-if (gender === '女') {  
-    gender = 'female';  
-} else if (gender === '男') {  
-    gender = 'male';  
+// 转换性别字段 - 确保转换为英文值
+if (gender === '女') {
+    gender = 'female';
+} else if (gender === '男') {
+    gender = 'male';
+}
+// 验证性别值
+if (gender !== 'male' && gender !== 'female') {
+    return res.status(400).json({ code: 400, message: '性别值无效' });
 }  
 
 
