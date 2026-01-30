@@ -932,9 +932,7 @@ if (gender === '女') {
     gender = 'male';
 }
 // 验证性别值
-if (gender !== 'male' && gender !== 'female') {
-    return res.status(400).json({ code: 400, message: '性别值无效' });
-}  
+  
 
 
         // 验证必填字段
