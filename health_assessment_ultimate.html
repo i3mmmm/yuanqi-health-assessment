@@ -792,7 +792,7 @@
                     'Content-Type': 'application/json'  
                 },  
                 body: JSON.stringify({  
-                    user_id: 'guest_' + Date.now(),  
+                    user_id: Math.floor(Date.now() / 1000),    
                     real_name: '访客',  
                     age: 0,  
                     gender: '未知',  
