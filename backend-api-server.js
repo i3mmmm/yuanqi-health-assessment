@@ -1124,10 +1124,10 @@ app.get('/api/assessments/:assessment_id', async (req, res) => {
 // 获取用户评估列表  
 app.get('/api/assessments', async (req, res) => {  
     try {  
-        const user_id = req.query.user_id;  
-        const page = parseInt(req.query.page) || 1;  
-        const limit = parseInt(req.query.limit) || 20;  
-        const offset = (page - 1) * limit;  
+        const user_id = req.query.user_id || null;  
+        const page = req.query.page ? parseInt(req.query.page) : 1;  
+        const limit = req.query.limit ? parseInt(req.query.limit) : 20;  
+        const offset = (page - 1) * limit;   
         let query = 'SELECT * FROM assessments';  
         let countQuery = 'SELECT COUNT(*) as total FROM assessments';  
         let params = [];  
@@ -1140,7 +1140,7 @@ app.get('/api/assessments', async (req, res) => {
         }  
         
         query += ' ORDER BY assessment_date DESC LIMIT ? OFFSET ?';  
-        params.push(parseInt(limit), parseInt(offset));  
+        params.push(limit, offset);    
           
         const [assessments] = await dbPool.execute(query, params);  
         const [countResult] = await dbPool.execute(countQuery, countParams);  
