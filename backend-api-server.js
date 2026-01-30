@@ -1138,7 +1138,7 @@ app.get('/api/assessments', async (req, res) => {
             params.push(user_id);  
             countParams.push(user_id);  
         }  
-        const offset = (page - 1) * limit;  
+        
         query += ' ORDER BY assessment_date DESC LIMIT ? OFFSET ?';  
         params.push(parseInt(limit), parseInt(offset));  
           
