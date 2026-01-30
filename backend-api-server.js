@@ -13,6 +13,22 @@ const fs = require('fs');
 const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 const puppeteer = require('puppeteer');
 
+// 安全的JSON解析函数
+function safeJsonParse(jsonString, defaultValue = []) {
+    try {
+        if (!jsonString) return defaultValue;
+        let cleaned = jsonString.trim();
+        if (cleaned.charCodeAt(0) === 0xFEFF) {
+            cleaned = cleaned.slice(1);
+        }
+        return JSON.parse(cleaned);
+    } catch (error) {
+        console.warn('JSON解析失败:', error.message);
+        return defaultValue;
+    }
+}
+
+
 // 初始化Express应用
 const app = express();
 const port = process.env.PORT || 8080;  
@@ -177,7 +193,7 @@ class HealthAnalysisEngine {
 
         symptoms.forEach(symptom => {
             try {
-                const causeLabels = JSON.parse(symptom.cause_labels);
+                const causeLabels = safeJsonParse(symptom.cause_labels);
                 causeLabels.forEach(label => {
                     if (causes.hasOwnProperty(label)) {
                         causes[label] += symptom.intensity;
@@ -252,7 +268,7 @@ class HealthAnalysisEngine {
 
                 if (symptomDetails.length > 0) {
                     try {
-                        const causes = JSON.parse(symptomDetails[0].causes);
+                        const causes = safeJsonParse(symptomDetails[0].causes);
                         causes.forEach(cause => {
                             const constitutionType = this.mapCauseToConstitution(cause.label);
                             if (constitutions.hasOwnProperty(constitutionType)) {
@@ -285,8 +301,8 @@ class HealthAnalysisEngine {
 
                 if (symptomDetails.length > 0) {
                     try {
-                        const warnings = JSON.parse(symptomDetails[0].warnings || '[]');
-                        const symptomTaboos = JSON.parse(symptomDetails[0].taboos || '[]');
+                        const warnings = safeJsonParse(symptomDetails[0].warnings || '[]');
+                        const symptomTaboos = safeJsonParse(symptomDetails[0].taboos || '[]');
 
                         warnings.forEach(warning => {
                             precautions[warning] = (precautions[warning] || 0) + symptom.intensity;
@@ -339,7 +355,7 @@ class HealthAnalysisEngine {
         // 基于症状关联的情绪状态
         symptoms.forEach(symptom => {
             try {
-                const causeLabels = JSON.parse(symptom.cause_labels);
+                const causeLabels = safeJsonParse(symptom.cause_labels);
                 causeLabels.forEach(label => {
                     if (label === '内分泌' || label === '毒素') {
                         emotions['压力过大'] += Math.floor(symptom.intensity * 0.3);
@@ -377,7 +393,7 @@ class HealthAnalysisEngine {
         // 基于症状名称和原因分析趋势
         symptoms.forEach(symptom => {
             const symptomName = symptom.symptom_name || '';
-            const causeLabels = JSON.parse(symptom.cause_labels || '[]');
+            const causeLabels = safeJsonParse(symptom.cause_labels || '[]');
 
             if (symptomName.includes('头疼') || symptomName.includes('头晕')) {
                 trends['高血压'] += Math.floor(symptom.intensity * 0.4);
@@ -420,7 +436,7 @@ class HealthAnalysisEngine {
 
         symptoms.forEach(symptom => {
             try {
-                const causeLabels = JSON.parse(symptom.cause_labels);
+                const causeLabels = safeJsonParse(symptom.cause_labels);
                 const symptomName = symptom.symptom_name || '';
 
                 if (symptomName.includes('眼') || symptomName.includes('视力')) {
@@ -489,7 +505,7 @@ class HealthAnalysisEngine {
 
                 if (symptomDetails.length > 0) {
                     try {
-                        const causes = JSON.parse(symptomDetails[0].causes);
+                        const causes = safeJsonParse(symptomDetails[0].causes);
                         causes.forEach(cause => {
                             if (cause.label === '营养') {
                                 // 根据症状特征推断营养缺乏
@@ -1074,22 +1090,22 @@ app.get('/api/assessments/:assessment_id', async (req, res) => {
         // 解析JSON字段
         const parsedSymptoms = symptoms.map(s => ({
             ...s,
-            cause_labels: JSON.parse(s.cause_labels || '[]')
+            cause_labels: safeJsonParse(s.cause_labels || '[]')
         }));
 
         const parsedAnalysis = analyses.length > 0 ? {
             ...analyses[0],
-            cause_analysis: JSON.parse(analyses[0].cause_analysis || '{}'),
-            organ_analysis: JSON.parse(analyses[0].organ_analysis || '{}'),
-            constitution_analysis: JSON.parse(analyses[0].constitution_analysis || '{}'),
-            precautions: JSON.parse(analyses[0].precautions || '{}'),
-            taboos: JSON.parse(analyses[0].taboos || '{}'),
-            emotion_analysis: JSON.parse(analyses[0].emotion_analysis || '{}'),
-            health_trends: JSON.parse(analyses[0].health_trends || '{}'),
-            lifestyle_habits: JSON.parse(analyses[0].lifestyle_habits || '{}'),
-            mineral_deficiency: JSON.parse(analyses[0].mineral_deficiency || '{}'),
-            vitamin_deficiency: JSON.parse(analyses[0].vitamin_deficiency || '{}'),
-            primary_issues: JSON.parse(analyses[0].primary_issues || '[]')
+            cause_analysis: safeJsonParse(analyses[0].cause_analysis || '{}'),
+            organ_analysis: safeJsonParse(analyses[0].organ_analysis || '{}'),
+            constitution_analysis: safeJsonParse(analyses[0].constitution_analysis || '{}'),
+            precautions: safeJsonParse(analyses[0].precautions || '{}'),
+            taboos: safeJsonParse(analyses[0].taboos || '{}'),
+            emotion_analysis: safeJsonParse(analyses[0].emotion_analysis || '{}'),
+            health_trends: safeJsonParse(analyses[0].health_trends || '{}'),
+            lifestyle_habits: safeJsonParse(analyses[0].lifestyle_habits || '{}'),
+            mineral_deficiency: safeJsonParse(analyses[0].mineral_deficiency || '{}'),
+            vitamin_deficiency: safeJsonParse(analyses[0].vitamin_deficiency || '{}'),
+            primary_issues: safeJsonParse(analyses[0].primary_issues || '[]')
         } : null;
 
         res.json({
@@ -1197,9 +1213,9 @@ app.get('/api/symptoms', async (req, res) => {
         // 解析JSON字段
         const parsedSymptoms = symptoms.map(s => ({
             ...s,
-            causes: JSON.parse(s.causes || '[]'),
-            warnings: JSON.parse(s.warnings || '[]'),
-            taboos: JSON.parse(s.taboos || '[]')
+            causes: safeJsonParse(s.causes || '[]'),
+            warnings: safeJsonParse(s.warnings || '[]'),
+            taboos: safeJsonParse(s.taboos || '[]')
         }));
 
         const total = countResult[0].total;
@@ -1467,9 +1483,9 @@ app.post('/api/reports/generate', async (req, res) => {
 
 // 生成报告HTML的辅助函数
 function generateReportHTML(assessment, analysis, reportType) {
-    const causeAnalysis = JSON.parse(analysis.cause_analysis || '{}');
-    const organAnalysis = JSON.parse(analysis.organ_analysis || '{}');
-    const constitutionAnalysis = JSON.parse(analysis.constitution_analysis || '{}');
+    const causeAnalysis = safeJsonParse(analysis.cause_analysis || '{}');
+    const organAnalysis = safeJsonParse(analysis.organ_analysis || '{}');
+    const constitutionAnalysis = safeJsonParse(analysis.constitution_analysis || '{}');
 
     return `
 <!DOCTYPE html>
