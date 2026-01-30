@@ -760,6 +760,13 @@
                     cards.forEach(card => {
                         if (card.textContent.includes(symptomName)) {
                             card.style.display = 'none';
+                            card.style.pointerEvents = 'none';
+                            card.style.opacity = '0.5';
+                            card.onclick = null;
+                            const symptomNameInCard = card.querySelector('.symptom-name')?.textContent;
+                            if (symptomNameInCard && selectedSymptoms[symptomNameInCard]) {
+                                delete selectedSymptoms[symptomNameInCard];
+                            }
                         }
                     });
                 });
@@ -767,8 +774,15 @@
                 const cards = document.querySelectorAll('.symptom-card');
                 cards.forEach(card => {
                     card.style.display = 'block';
+                    card.style.pointerEvents = 'auto';
+                    card.style.opacity = '1';
+                    const symptomName = card.querySelector('.symptom-name')?.textContent;
+                    if (symptomName) {
+                        card.onclick = (e) => toggleSymptom(symptomName, e);
+                    }
                 });
             }
+            renderSymptoms();
         }
         
         function filterSymptoms(filter) {
