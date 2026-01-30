@@ -1000,7 +1000,7 @@ if (user_id === null || user_id === undefined ||
                 [
                     assessmentId,
                     symptom.symptom_id || null,
-                    symptom.symptom_name,
+                    (symptom.symptom_name || symptom.name),
                     side,
                     symptom.intensity,
                     severity,
