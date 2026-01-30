@@ -1,7 +1,7 @@
 {
   "name": "yuanqi-health-assessment-api",
-  "version": "1.0.3",
-  "description": "\u5143\u7081\u6e90\u6d41\u5065\u5eb7\u8bc4\u4f30\u7cfb\u7edf - \u540e\u7aefAPI\u670d\u52a1",
+  "version": "1.2.1",
+  "description": "元炁源流健康评估系统 - 后端API服务",
   "main": "backend-api-server.js",
   "scripts": {
     "start": "node backend-api-server.js",
@@ -14,7 +14,7 @@
     "tcm",
     "api"
   ],
-  "author": "\u5143\u7081\u6e90\u6d41",
+  "author": "元炁源流",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
