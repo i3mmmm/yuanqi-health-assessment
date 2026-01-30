@@ -810,7 +810,7 @@ fetch('/api/assessments', {
         diastolic_pressure: 0,  
         remarks: document.getElementById('notes-input').value || '',  
         symptoms: Object.keys(selectedSymptoms).map(symptomName => ({  
-            name: symptomName,  
+            symptom_name: symptomName,  
             intensity: selectedSymptoms[symptomName].intensity || 0,  
             severity_level: selectedSymptoms[symptomName].severity || 'mild'  
         }))  
