@@ -911,20 +911,27 @@ app.post('/api/assessments', async (req, res) => {
     const connection = await dbPool.getConnection();
 
     try {
-        const {
-            user_id,
-            real_name,
-            age,
-            gender,
-            height,
-            weight,
-            waist_circumference,
-            blood_sugar,
-            systolic_pressure,
-            diastolic_pressure,
-            remarks,
-            symptoms
-        } = req.body;
+        let {  
+    user_id,  
+    real_name,  
+    age,  
+    gender,  
+    height,  
+    weight,  
+    waist_circumference,  
+    blood_sugar,  
+    systolic_pressure,  
+    diastolic_pressure,  
+    remarks,  
+    symptoms  
+} = req.body;  
+// 转换性别字段  
+if (gender === '女') {  
+    gender = 'female';  
+} else if (gender === '男') {  
+    gender = 'male';  
+}  
+
 
         // 验证必填字段
         // 验证必填字段  
@@ -952,8 +959,8 @@ if (user_id === null || user_id === undefined ||
 
         // 插入评估记录
         const [assessmentResult] = await connection.execute(
-            `INSERT INTO assessments (
-                user_id, assessment_code, assessment_date, real_name, age, gender,
+            `INSERT INTO assessments (  
+                user_id, assessment_code, assessment_date, real_name, age, gender,  
                 height, weight, waist_circumference, blood_sugar, systolic_pressure, diastolic_pressure,
                 remarks, total_symptoms, total_score, avg_score, status
             ) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
