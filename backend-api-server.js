@@ -929,7 +929,7 @@ app.get('/api/assessments/list', authenticateToken, async (req, res) => {
 });
 
 // 查看单个评估详情
-app.get('/api/assessments/:id', async (req, res) => {
+app.get('/api/assessments/:id', authenticateToken, async (req, res) => {
     const connection = await dbPool.getConnection();
     try {
         const { id } = req.params;
