@@ -748,7 +748,7 @@ window.addEventListener('load', function() {
             const selectedSymptomsList = data.selectedSymptoms || [];
             
             document.getElementById('selected-symptoms-count').textContent = selectedSymptoms.size;
-            document.getElementById('total-symptoms-in-report').textContent = selectedSymptomsList.length;
+            document.getElementById('total-symptoms-in-report').textContent = filteredSymptoms.length;
             
             const container = document.getElementById('symptoms-list');
             
@@ -762,7 +762,16 @@ window.addEventListener('load', function() {
                 return;
             }
             
-            container.innerHTML = selectedSymptomsList.map(symptom => {
+            const gender = data.customer_info?.gender || '';
+            const gynecologicalSymptoms = [270];
+            const filteredSymptoms = selectedSymptomsList.filter(symptom => {
+                if (gender === '男' && gynecologicalSymptoms.includes(symptom.id)) {
+                    return false;
+                }
+                return true;
+            });
+            
+            container.innerHTML = filteredSymptoms.map(symptom => {
                 const isSelected = selectedSymptoms.has(symptom.id);
                 return `
                     <div class="symptom-item ${isSelected ? 'selected' : ''}" 
