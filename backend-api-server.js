@@ -1882,7 +1882,7 @@ app.post('/api/admin/login', async (req, res) => {
         if (username === 'admin' && password === 'z123456') {
             const token = jwt.sign(
                 { userId: 'admin', role: 'admin' },
-                'your-secret-key',
+                JWT_SECRET,
                 { expiresIn: '24h' }
             );
             return res.json({ code: 200, message: '登录成功', token });
