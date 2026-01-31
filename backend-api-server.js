@@ -1872,6 +1872,29 @@ app.get('/api/health', (req, res) => {
 });
 
 // 404处理
+
+// 管理员登录端点
+app.post('/api/admin/login', async (req, res) => {
+    try {
+        const { username, password } = req.body;
+        
+        // 验证管理员凭证
+        if (username === 'admin' && password === 'z123456') {
+            const token = jwt.sign(
+                { userId: 'admin', role: 'admin' },
+                'your-secret-key',
+                { expiresIn: '24h' }
+            );
+            return res.json({ code: 200, message: '登录成功', token });
+        }
+        
+        res.status(401).json({ code: 401, message: '用户名或密码错误' });
+    } catch (error) {
+        console.error('登录错误:', error);
+        res.status(500).json({ code: 500, message: '登录失败' });
+    }
+});
+
 app.use((req, res) => {
     res.status(404).json({ code: 404, message: '接口不存在' });
 });
