@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌟</text></svg>">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>元炁源流 · 健康自检评估系统</title>
@@ -822,6 +823,7 @@
 
         // 提交评估
         function submitAssessment() {
+            // 检查是否选择了症状
             if (Object.keys(selectedSymptoms).length === 0) {
                 showNotification('请至少选择一个症状', 'error');
                 return;
@@ -829,114 +831,69 @@
 
             showLoading('正在提交评估...');
 
+            // 获取性别值
+            let genderValue = document.getElementById('gender-input')?.value || 'male';
+            
+            // 转换性别值
+            if (genderValue === '女' || genderValue === 'female') {
+                genderValue = 'female';
+            } else if (genderValue === '男' || genderValue === 'male') {
+                genderValue = 'male';
+            } else {
+                genderValue = 'male';
+            }
+
             // 构建评估数据
             const assessmentData = {
-                id: Date.now(),
-                assessment_code: `YA${new Date().toISOString().slice(0,10).replace(/-/g,'')}${String(Math.floor(Math.random() * 10000)).padStart(4,'0')}`,
+                user_id: Math.floor(Date.now() / 1000),
                 real_name: '访客',
                 age: 0,
-                gender: document.getElementById('gender-input')?.value || 'male',
+                gender: genderValue,
+                height: 0,
+                weight: 0,
+                waist_circumference: 0,
+                blood_sugar: 0,
+                systolic_pressure: 0,
+                diastolic_pressure: 0,
+                remarks: document.getElementById('notes-input')?.value || '',
                 symptoms: Object.entries(selectedSymptoms).map(([name, data]) => ({
-                    name: name,
-                    intensity: data.intensity,
-                    severity_level: data.severity
-                })),
-                total_symptoms: Object.keys(selectedSymptoms).length,
-                total_score: Object.values(selectedSymptoms).reduce((sum, s) => sum + s.intensity, 0),
-                avg_score: Object.values(selectedSymptoms).reduce((sum, s) => sum + s.intensity, 0) / Object.keys(selectedSymptoms).length,
-                notes: document.getElementById('notes-input').value,
-                created_at: new Date().toISOString()
+                    symptom_name: name,
+                    intensity: data.intensity || 0,
+                    severity_level: data.severity || 'mild'
+                }))
             };
-            // 检查是否选择了症状  
-if (Object.keys(selectedSymptoms).length === 0) {  
-    showNotification('请至少选择一个症状', 'error');  
-    return;  
-}  
-            
-// 发送到后端服务器  
-fetch('/api/assessments', {  
-    method: 'POST',  
-    headers: {  
-        'Content-Type': 'application/json'  
-    },  
-    body: JSON.stringify({  
-        user_id: Math.floor(Date.now() / 1000),  
-        real_name: '访客',  
-        age: 0,  
-        gender: document.getElementById('gender-input')?.value || 'male',  
-        height: 0,  
-        weight: 0,  
-        waist_circumference: 0,  
-        blood_sugar: 0,  
-        systolic_pressure: 0,  
-        diastolic_pressure: 0,  
-        remarks: document.getElementById('notes-input').value || '',  
-        symptoms: Object.keys(selectedSymptoms).map(symptomName => ({  
-            symptom_name: symptomName,  
-            intensity: selectedSymptoms[symptomName].intensity || 0,  
-            severity_level: selectedSymptoms[symptomName].severity || 'mild'  
-        }))  
-    })  
-})  
 
-            // 发送到后端服务器  
-            fetch('/api/assessments', {  
-                method: 'POST',  
-                headers: {  
-                    'Content-Type': 'application/json'  
-                },  
-                body: JSON.stringify({  
-                    user_id: Math.floor(Date.now() / 1000),    
-                    real_name: '访客',  
-                    age: 0,  
-                    gender: '未知',  
-                    height: 0,  
-                    weight: 0,  
-                    waist_circumference: 0,  
-                    blood_sugar: 0,  
-                    systolic_pressure: 0,  
-                    diastolic_pressure: 0,  
-                    remarks: document.getElementById('notes-input').value,  
-                    symptoms: Object.entries(selectedSymptoms).map(([name, data]) => ({  
-                        name: name,  
-                        intensity: data.intensity || 0,  
-                        severity_level: data.severity  
-                    }))  
-                })  
-            })  
-            .then(response => response.json())  
-            .then(result => {  
-                if (result.code === 200) {  
-                    console.log('评估已保存到服务器:', result);  
-                } else {  
-                    console.error('保存到服务器失败:', result.message);  
-                }  
-            })  
-            .catch(error => {  
-                console.error('发送到服务器失败:', error);  
-            });  
-
-            // 保存到本地存储
-            assessments.unshift(assessmentData);
-            localStorage.setItem('yuanqi_assessments', JSON.stringify(assessments));
-
-            // 清空选择
-            selectedSymptoms = {};
-            document.getElementById('notes-input').value = '';
-            renderSymptoms();
-            updateStats();
-
-            // 更新评估记录页面
-            renderAssessments();
-            updateHistoryStats();
-
-            hideLoading();
-            showNotification('评估提交成功！', 'success');
-
-            // 切换到评估记录页面
-            setTimeout(() => {
-                switchTab('history');
-            }, 1500);
+            // 发送到后端服务器
+            fetch('/api/assessments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(assessmentData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP error! status: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                hideLoading();
+                showNotification('评估提交成功！', 'success');
+                
+                // 保存评估 ID
+                const assessmentId = data._id || data.id;
+                
+                // 延迟 2 秒后跳转到结果页面
+                setTimeout(() => {
+                    window.location.href = '/result.html?id=' + assessmentId;
+                }, 2000);
+            })
+            .catch(error => {
+                hideLoading();
+                console.error('错误:', error);
+                showNotification('保存到服务器失败: ' + error.message, 'error');
+            });
         }
 
         // 渲染评估记录
