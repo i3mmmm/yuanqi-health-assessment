@@ -907,7 +907,7 @@ app.post('/api/auth/login', async (req, res) => {
 // 2. 评估数据API
 
 // 创建新评估
-app.get('/api/assessments/list', async (req, res) => {
+app.get('/api/assessments/list', authenticateToken, async (req, res) => {
     const connection = await dbPool.getConnection();
     try {
         const [assessments] = await connection.execute(
