@@ -1801,6 +1801,66 @@ app.get('/api/admin/assessments', authenticateToken, requirePractitioner, async 
         res.status(500).json({ code: 500, message: '获取评估列表失败: ' + error.message });
     }
 });
+
+// 查看所有评估记录
+app.get('/api/assessments/list', async (req, res) => {
+    const connection = await dbPool.getConnection();
+    try {
+        const [assessments] = await connection.execute(
+            `SELECT 
+                id, assessment_code, assessment_date, real_name, age, gender,
+                height, weight, blood_sugar, systolic_pressure, diastolic_pressure,
+                total_symptoms, total_score, avg_score, status, remarks
+             FROM assessments
+             ORDER BY assessment_date DESC
+             LIMIT 100`
+        );
+        res.json({ code: 200, data: assessments });
+    } catch (error) {
+        console.error('查询失败:', error);
+        res.status(500).json({ code: 500, message: '查询失败' });
+    } finally {
+        connection.release();
+    }
+});
+
+// 查看单个评估详情
+app.get('/api/assessments/:id', async (req, res) => {
+    const connection = await dbPool.getConnection();
+    try {
+        const { id } = req.params;
+        
+        const [assessments] = await connection.execute(
+            `SELECT * FROM assessments WHERE id = ?`,
+            [id]
+        );
+        
+        if (assessments.length === 0) {
+            return res.status(404).json({ code: 404, message: '评估不存在' });
+        }
+
+        const assessment = assessments[0];
+
+        const [symptoms] = await connection.execute(
+            `SELECT symptom_name, intensity, category FROM assessment_symptoms WHERE assessment_id = ?`,
+            [id]
+        );
+
+        res.json({ 
+            code: 200, 
+            data: {
+                ...assessment,
+                symptoms: symptoms
+            }
+        });
+    } catch (error) {
+        console.error('查询失败:', error);
+        res.status(500).json({ code: 500, message: '查询失败' });
+    } finally {
+        connection.release();
+    }
+});
+
 // 根路由 - 返回主页表单  
 app.get('/', (req, res) => {  
     res.sendFile(path.join(__dirname, 'health_assessment_ultimate.html'));  

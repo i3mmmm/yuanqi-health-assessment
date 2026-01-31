@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>健康评估 - 数据管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        thead {
+            background: #f5f5f5;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            margin-right: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .action-btn-view {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn-view:hover {
+            background: #5568d3;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .detail-item {
+            margin-bottom: 15px;
+        }
+
+        .detail-item label {
+            display: block;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .detail-item value {
+            display: block;
+            color: #333;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 健康评估数据管理</h1>
+            <p>查看和管理所有提交的健康评估记录</p>
+        </div>
+
+        <div class="content">
+            <a href="/" class="back-link">← 返回评估表单</a>
+
+            <div id="message"></div>
+
+            <div class="controls">
+                <button class="btn btn-primary" onclick="loadAssessments()">🔄 刷新数据</button>
+                <button class="btn btn-secondary" onclick="exportData()">📥 导出 CSV</button>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜索姓名或评估代码..." onkeyup="filterTable()">
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>总评估数</h3>
+                    <div class="number" id="totalCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>平均评分</h3>
+                    <div class="number" id="avgScore">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>最高评分</h3>
+                    <div class="number" id="maxScore">0</div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="assessmentTable">
+                    <thead>
+                        <tr>
+                            <th>评估代码</th>
+                            <th>姓名</th>
+                            <th>年龄</th>
+                            <th>性别</th>
+                            <th>症状数</th>
+                            <th>平均评分</th>
+                            <th>评估日期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="8" class="loading">加载中...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 详情模态框 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>评估详情</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <script>
+        let allAssessments = [];
+
+        async function loadAssessments() {
+            try {
+                const response = await fetch('/api/assessments/list');
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    allAssessments = result.data;
+                    renderTable();
+                    updateStats();
+                    showMessage('数据加载成功', 'success');
+                } else {
+                    showMessage('加载失败: ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('加载失败: ' + error.message, 'error');
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            if (allAssessments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty">暂无数据</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allAssessments.map(assessment => `
+                <tr>
+                    <td>${assessment.assessment_code}</td>
+                    <td>${assessment.real_name}</td>
+                    <td>${assessment.age}</td>
+                    <td>${assessment.gender === 'male' ? '男' : assessment.gender === 'female' ? '女' : assessment.gender}</td>
+                    <td>${assessment.total_symptoms}</td>
+                    <td>${parseFloat(assessment.avg_score).toFixed(2)}</td>
+                    <td>${new Date(assessment.assessment_date).toLocaleDateString('zh-CN')}</td>
+                    <td>
+                        <button class="action-btn action-btn-view" onclick="viewDetail(${assessment.id})">查看</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function viewDetail(id) {
+            try {
+                const response = await fetch(`/api/assessments/${id}`);
+                const result = await response.json();
+
+                if (result.code === 200) {
+                    const data = result.data;
+                    const symptomsHtml = data.symptoms.map(s => `
+                        <div class="detail-item">
+                            <label>${s.symptom_name}</label>
+                            <value>强度: ${s.intensity} | 分类: ${s.category}</value>
+                        </div>
+                    `).join('');
+
+                    document.getElementById('detailContent').innerHTML = `
+                        <div class="detail-item">
+                            <label>评估代码</label>
+                            <value>${data.assessment_code}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>姓名</label>
+                            <value>${data.real_name}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>年龄</label>
+                            <value>${data.age}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>性别</label>
+                            <value>${data.gender === 'male' ? '男' : data.gender === 'female' ? '女' : data.gender}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>身高 (cm)</label>
+                            <value>${data.height}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>体重 (kg)</label>
+                            <value>${data.weight}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>血糖 (mmol/L)</label>
+                            <value>${data.blood_sugar}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>收缩压 (mmHg)</label>
+                            <value>${data.systolic_pressure}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>舒张压 (mmHg)</label>
+                            <value>${data.diastolic_pressure}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>症状数</label>
+                            <value>${data.total_symptoms}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>总评分</label>
+                            <value>${data.total_score}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>平均评分</label>
+                            <value>${parseFloat(data.avg_score).toFixed(2)}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>备注</label>
+                            <value>${data.remarks || '无'}</value>
+                        </div>
+                        <div class="detail-item">
+                            <label>症状详情</label>
+                            <value>${symptomsHtml || '无症状'}</value>
+                        </div>
+                    `;
+
+                    document.getElementById('detailModal').classList.add('active');
+                } else {
+                    showMessage('加载详情失败', 'error');
+                }
+            } catch (error) {
+                showMessage('加载详情失败: ' + error.message, 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function updateStats() {
+            const totalCount = allAssessments.length;
+            const avgScore = allAssessments.length > 0 
+                ? (allAssessments.reduce((sum, a) => sum + parseFloat(a.avg_score), 0) / allAssessments.length).toFixed(2)
+                : 0;
+            const maxScore = allAssessments.length > 0
+                ? Math.max(...allAssessments.map(a => parseFloat(a.avg_score))).toFixed(2)
+                : 0;
+
+            document.getElementById('totalCount').textContent = totalCount;
+            document.getElementById('avgScore').textContent = avgScore;
+            document.getElementById('maxScore').textContent = maxScore;
+        }
+
+        function filterTable() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#tableBody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchText) ? '' : 'none';
+            });
+        }
+
+        function exportData() {
+            if (allAssessments.length === 0) {
+                showMessage('没有数据可导出', 'error');
+                return;
+            }
+
+            const headers = ['评估代码', '姓名', '年龄', '性别', '身高', '体重', '血糖', '收缩压', '舒张压', '症状数', '平均评分', '评估日期'];
+            const rows = allAssessments.map(a => [
+                a.assessment_code,
+                a.real_name,
+                a.age,
+                a.gender === 'male' ? '男' : a.gender === 'female' ? '女' : a.gender,
+                a.height,
+                a.weight,
+                a.blood_sugar,
+                a.systolic_pressure,
+                a.diastolic_pressure,
+                a.total_symptoms,
+                parseFloat(a.avg_score).toFixed(2),
+                new Date(a.assessment_date).toLocaleDateString('zh-CN')
+            ]);
+
+            let csv = headers.join(',') + '\n';
+            rows.forEach(row => {
+                csv += row.map(cell => `"${cell}"`).join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `health-assessment-${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+
+            showMessage('数据导出成功', 'success');
+        }
+
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 3000);
+        }
+
+        window.addEventListener('load', loadAssessments);
+
+        document.getElementById('detailModal').addEventListener('click', (e) => {
+            if (e.target.id === 'detailModal') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
