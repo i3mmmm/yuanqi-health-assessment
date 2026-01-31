@@ -656,11 +656,18 @@
 
             let filteredSymptoms = symptoms;
 
+            // 根据性别过滤
+            const gender = document.getElementById('gender-input')?.value;
+            const gynecologicalSymptoms = ['乳头凹陷', '乳头流脓', '乳房肿块', '乳房增生', '不孕不育', '流产', '死胎', '月经少有块', '经量多', '经期提前', '经期推后', '经期烦躁', '经期胸胀', '经期厌食', '经期浮肿', '经期腰痛', '经期头痛', '经期困倦', '经期失眠', '痛经', '经期小腹怕凉', '经期小腹下坐', '月经暗', '月经淡', '月经黑', '经期长痘', '经期皮肤差', '经期乳房胀痛', '经期乳房疼痛', '经期乳房硬块', '经期乳房下垂', '经期乳房萎缩', '经期乳房增大', '经期乳房缩小', '经期乳房疼痛', '阴道瘙痒', '阴道干涩', '阴道分泌物异常', '白带异常', '白带增多', '白带减少', '白带黄', '白带绿', '白带臭', '小腹闷痛', '经期时长'];
+            if (gender === 'male') {
+                filteredSymptoms = symptoms.filter(s => !gynecologicalSymptoms.includes(s.name));
+            }
+
             // 根据筛选条件过滤
             if (currentFilter === 'selected') {
-                filteredSymptoms = symptoms.filter(s => selectedSymptoms[s.name]);
+                filteredSymptoms = filteredSymptoms.filter(s => selectedSymptoms[s.name]);
             } else if (currentFilter === 'unselected') {
-                filteredSymptoms = symptoms.filter(s => !selectedSymptoms[s.name]);
+                filteredSymptoms = filteredSymptoms.filter(s => !selectedSymptoms[s.name]);
             }
 
             filteredSymptoms.forEach(symptom => {
