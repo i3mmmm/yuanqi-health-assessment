@@ -10,11 +10,11 @@ console.log('正在连接到Zeabur MySQL数据库...\n');
 
 // 数据库连接配置
 const connection = mysql.createConnection({
-  host: 'sjc1.clusters.zeabur.com',
-  port: 27983,
-  user: 'root',
-  password: '9ODHR03Mp6hw8iYPq1en4QgrU275tEzc',
-  database: 'zeabur',
+  host: process.env.DB_HOST || 'sjc1.clusters.zeabur.com',
+  port: process.env.DB_PORT || 27983,
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME || 'zeabur',
   multipleStatements: true  // 允许执行多条SQL语句
 });
 
