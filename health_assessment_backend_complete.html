@@ -746,13 +746,25 @@ window.addEventListener('load', function() {
         
         function renderSymptomsList(data) {
             const selectedSymptomsList = data.selectedSymptoms || [];
+            const container = document.getElementById('symptoms-list');
             
+            // 先定义性别和妇科症状
+            const gender = data.customer_info?.gender || '';
+            const gynecologicalSymptoms = [270];
+            
+            // 根据性别过滤症状
+            const filteredSymptoms = selectedSymptomsList.filter(symptom => {
+                if (gender === '男' && gynecologicalSymptoms.includes(symptom.id)) {
+                    return false;
+                }
+                return true;
+            });
+            
+            // 更新计数
             document.getElementById('selected-symptoms-count').textContent = selectedSymptoms.size;
             document.getElementById('total-symptoms-in-report').textContent = filteredSymptoms.length;
             
-            const container = document.getElementById('symptoms-list');
-            
-            if (selectedSymptomsList.length === 0) {
+            if (filteredSymptoms.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state" style="grid-column: 1 / -1;">
                         <div class="icon">📋</div>
@@ -761,15 +773,6 @@ window.addEventListener('load', function() {
                 `;
                 return;
             }
-            
-            const gender = data.customer_info?.gender || '';
-            const gynecologicalSymptoms = [270];
-            const filteredSymptoms = selectedSymptomsList.filter(symptom => {
-                if (gender === '男' && gynecologicalSymptoms.includes(symptom.id)) {
-                    return false;
-                }
-                return true;
-            });
             
             container.innerHTML = filteredSymptoms.map(symptom => {
                 const isSelected = selectedSymptoms.has(symptom.id);
