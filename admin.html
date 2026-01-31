@@ -356,11 +356,28 @@
     </div>
 
     <script>
+        // 检查登录状态
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/admin-login.html';
+        }
+
+        // 添加登出功能
+        function logout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/admin-login.html';
+        }
+    
         let allAssessments = [];
 
         async function loadAssessments() {
             try {
-                const response = await fetch('/api/assessments/list');
+                const token = localStorage.getItem('adminToken');
+                const response = await fetch('/api/assessments/list', {
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    }
+                });
                 const result = await response.json();
 
                 if (result.code === 200) {
