@@ -926,9 +926,12 @@ app.post('/api/assessments', async (req, res) => {
     symptoms  
 } = req.body;  
 // 转换性别字段 - 确保转换为英文值
-if (gender === '女') {
+if (gender === '女' || gender === 'female') {
     gender = 'female';
-} else if (gender === '男') {
+} else if (gender === '男' || gender === 'male') {
+    gender = 'male';
+} else {
+    // 如果是其他值，默认为 male
     gender = 'male';
 }
 // 验证性别值
