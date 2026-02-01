@@ -860,7 +860,106 @@
         }
 
         // 提交评估
-        function submitAssessment() {
+        function submitAssessment() {  
+    // 验证必填字段  
+    const realName = document.getElementById('real-name-input')?.value?.trim();  
+    const age = document.getElementById('age-input')?.value;  
+    const gender = document.getElementById('gender-input')?.value;  
+    const phone = document.getElementById('phone-input')?.value?.trim();  // ← 获取电话号码  
+      
+    // 验证电话号码是否填写  
+    if (!phone) {  
+        alert('请输入联系电话');  
+        return;  
+    }  
+      
+    // 验证电话号码格式（11位数字）  
+    if (!/^\d{11}$/.test(phone)) {  
+        alert('请输入有效的11位电话号码');  
+        return;  
+    }  
+      
+    // 验证其他必填字段  
+    if (!realName) {  
+        alert('请输入姓名');  
+        return;  
+    }  
+      
+    if (!age) {  
+        alert('请输入年龄');  
+        return;  
+    }  
+      
+    if (!gender) {  
+        alert('请选择性别');  
+        return;  
+    }  
+      
+    // 检查是否选择了症状  
+    if (Object.keys(selectedSymptoms).length === 0) {  
+        alert('请至少选择一个症状');  
+        return;  
+    }  
+      
+    // 计算统计数据  
+    const totalSymptoms = Object.keys(selectedSymptoms).length;  
+    const totalScore = Object.values(selectedSymptoms).reduce((sum, score) => sum + score, 0);  
+    const avgScore = (totalScore / totalSymptoms).toFixed(2);  
+      
+    // 生成 assessment_code（使用电话号码 + 001）  
+    const assessmentCode = phone + '001';  // ← 自动生成 ID  
+      
+    // 构建评估数据  
+    const assessmentData = {  
+        assessment_code: assessmentCode,  // ← 新增  
+        real_name: realName,  
+        age: parseInt(age),  
+        gender: gender,  
+        phone: phone,  // ← 新增  
+        symptoms: selectedSymptoms,  
+        total_symptoms: totalSymptoms,  
+        total_score: totalScore,  
+        avg_score: parseFloat(avgScore),  
+        remarks: document.getElementById('remarks-input')?.value || '',  
+        height: document.getElementById('height-input')?.value || null,  
+        weight: document.getElementById('weight-input')?.value || null,  
+        waist_circumference: document.getElementById('waist-circumference-input')?.value || null,  
+        blood_sugar: document.getElementById('blood-sugar-input')?.value || null,  
+        systolic_pressure: document.getElementById('systolic-pressure-input')?.value || null,  
+        diastolic_pressure: document.getElementById('diastolic-pressure-input')?.value || null  
+    };  
+      
+    // 发送到后端  
+    fetch('/api/assessments', {  
+        method: 'POST',  
+        headers: {  
+            'Content-Type': 'application/json'  
+        },  
+        body: JSON.stringify(assessmentData)  
+    })  
+    .then(response => {  
+        if (!response.ok) {  
+            throw new Error(`HTTP error! status: ${response.status}`);  
+        }  
+        return response.json();  
+    })  
+    .then(data => {  
+        if (data.code === 200) {  
+            alert(`评估已保存！\n您的评估 ID：${assessmentCode}`);  
+            // 重置表单  
+            document.getElementById('assessment-form').reset();  
+            selectedSymptoms = {};  
+            updateStats();  
+        } else {  
+            alert('保存失败: ' + data.message);  
+        }  
+    })  
+    .catch(error => {  
+        console.error('错误:', error);  
+        alert('提交失败: ' + error.message);  
+    });  
+}  
+ {
             // 检查是否选择了症状
             if (Object.keys(selectedSymptoms).length === 0) {
                 showNotification('请至少选择一个症状', 'error');
