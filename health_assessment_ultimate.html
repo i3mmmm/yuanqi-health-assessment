@@ -763,39 +763,73 @@
         }
 
         // 筛选症状
-        function filterSymptomsByGender() {
-            const gender = document.getElementById('gender-input')?.value;
-            const gynecologicalSymptoms = ['乳头凹陷', '乳头流脓', '乳房肿块', '乳房增生', '不孕不育', '流产', '死胎', '月经少有块', '经量多', '经期提前', '经期推后', '经期烦躁', '经期胸胀', '经期厌食', '经期浮肿', '经期腰痛', '经期头痛', '经期困倦', '经期失眠', '痛经', '经期小腹怕凉', '经期小腹下坠', '月经暗', '月经淡', '月经黑', '经期长痘', '经期皮肤差', '经期乳房胀痛', '经期乳房疼痛', '经期乳房硬块', '经期乳房下垂', '经期乳房萎缩', '经期乳房增大', '经期乳房缩小', '经期乳房疼痛', '阴道瘙痒', '阴道干涩', '阴道分泌物异常', '白带异常', '白带增多', '白带减少', '白带黄', '白带绿', '白带臭', '小腹闷痛', '经期时长'];
-            if (gender === 'male') {
-                gynecologicalSymptoms.forEach(symptomName => {
-                    const cards = document.querySelectorAll('.symptom-card');
-                    cards.forEach(card => {
-                        if (card.textContent.includes(symptomName)) {
-                            card.style.display = 'none';
-                            card.style.pointerEvents = 'none';
-                            card.style.opacity = '0.5';
-                            card.onclick = null;
-                            const symptomNameInCard = card.querySelector('.symptom-name')?.textContent;
-                            if (symptomNameInCard && selectedSymptoms[symptomNameInCard]) {
-                                delete selectedSymptoms[symptomNameInCard];
-                            }
-                        }
-                    });
-                });
-            } else {
-                const cards = document.querySelectorAll('.symptom-card');
-                cards.forEach(card => {
-                    card.style.display = 'block';
-                    card.style.pointerEvents = 'auto';
-                    card.style.opacity = '1';
-                    const symptomName = card.querySelector('.symptom-name')?.textContent;
-                    if (symptomName) {
-                        card.onclick = (e) => toggleSymptom(symptomName, e);
-                    }
-                });
-            }
-            renderSymptoms();
-        }
+        function filterSymptomsByGender() {  
+    const gender = document.getElementById('gender-input')?.value;  
+      
+    // 完整的妇科症状列表  
+    const gynecologicalSymptoms = [  
+        // 乳房相关  
+        '乳头凹陷', '乳头流脓', '乳房肿块', '乳房增生', '乳房胀痛', '乳房疼痛',   
+        '乳房硬块', '乳房下垂', '乳房萎缩', '乳房增大', '乳房缩小',  
+          
+        // 生育相关  
+        '不孕不育', '流产', '死胎',  
+          
+        // 月经相关  
+        '月经少有块', '经量多', '经期提前', '经期推后', '月经暗', '月经淡', '月经黑',  
+        '经期烦躁', '经期胸胀', '经期厌食', '经期浮肿', '经期腰痛', '经期头痛',   
+        '经期困倦', '经期失眠', '痛经', '经期小腹怕凉', '经期小腹下垂',  
+        '经期长痘', '经期皮肤差', '经期乳房胀痛', '经期乳房疼痛', '经期乳房硬块',  
+        '经期乳房下垂', '经期乳房萎缩', '经期乳房增大', '经期乳房缩小', '经期乳房疼痛',  
+        '经期时长',  
+          
+        // 阴道相关  
+        '阴道瘙痒', '阴道干涩', '阴道分泌物异常', '白带异常', '白带增多', '白带减少',  
+        '白带黄', '白带绿', '白带臭',  
+          
+        // 腹部相关  
+        '小腹闷痛'  
+    ];  
+      
+    // 获取所有症状卡片  
+    const cards = document.querySelectorAll('.symptom-card');  
+      
+    cards.forEach(card => {  
+        const symptomNameElement = card.querySelector('.symptom-name');  
+        const symptomName = symptomNameElement?.textContent?.trim();  
+          
+        if (!symptomName) return;  
+          
+        const isGynecological = gynecologicalSymptoms.includes(symptomName);  
+          
+        if (gender === 'male' && isGynecological) {  
+            // 男性：隐藏妇科项目  
+            card.style.display = 'none';  
+            card.style.pointerEvents = 'none';  
+            card.style.opacity = '0.3';  
+              
+            // 取消选中该症状  
+            if (selectedSymptoms[symptomName]) {  
+                delete selectedSymptoms[symptomName];  
+            }  
+              
+            // 取消勾选复选框  
+            const checkbox = card.querySelector('input[type="checkbox"]');  
+            if (checkbox) {  
+                checkbox.checked = false;  
+            }  
+        } else {  
+            // 女性或未选择性别：显示所有项目  
+            card.style.display = 'block';  
+            card.style.pointerEvents = 'auto';  
+            card.style.opacity = '1';  
+        }  
+    });  
+      
+    // 重新计算统计  
+    updateStats();  
+}  
+
         
         function filterSymptoms(filter) {
             currentFilter = filter;
